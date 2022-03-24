@@ -17,9 +17,25 @@ class SurveyMonkey:
     def EndPointSurvey(self):
         endpoint = {'apiurl':"http://api.surveymonkey.com/v3/surveys",
                     'responses':"http://api.surveymonkey.com/v3/surveys/__id__/responses",
+                    'details':"http://api.surveymonkey.com/v3/surveys/__id__/details",
+                    'rollups':"http://api.surveymonkey.com/v3/surveys/__id__/rollups"
                     }
 
         return endpoint
+
+    def GetSurveyDetails(self,id):
+        url = self.EndPointSurvey()['details'].replace('__id__',str(id))
+        r = self.session.get(url)
+        data = r.json()
+
+        return data
+
+    def GetRollUpsSurvey(self,id):
+        url = self.EndPointSurvey()['rollups'].replace('__id__',str(id))
+        r = self.session.get(url)
+        data = r.json()
+
+        return data
 
     def GetForms(self):
         url = self.EndPointSurvey()['apiurl']
@@ -32,7 +48,7 @@ class SurveyMonkey:
         #formularios['link'] = [key['href'] for key in data]
         formularios['id'] = [key['id'] for key in data]
 
-        #formularios = formularios[formularios['titulo_interno']!='']
+        formularios = formularios[formularios['titulo_interno']!='']
         return formularios
         
 
@@ -48,7 +64,7 @@ class SurveyMonkey:
         id_forms = list(self.GetForms()['id'])
         n_responses = []
         for id in id_forms:
-            n_response = len(self.GetResponse(id))
+            n_response = sm.GetRollUpsSurvey(id)['data'][0]['summary'][0]['answered']
             n_responses.append(n_response)
 
         formularios = self.GetForms()
@@ -71,4 +87,4 @@ class SurveyMonkey:
         data = self.GetNumberResponses()
         return data.to_csv(f'tabla_{len(data)}_formularios.csv')
 
-SurveyMonkey = SurveyMonkey(acces_token=access_token)
+sm = SurveyMonkey(acces_token=access_token)
