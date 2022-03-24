@@ -18,7 +18,8 @@ class SurveyMonkey:
         endpoint = {'apiurl':"http://api.surveymonkey.com/v3/surveys",
                     'responses':"http://api.surveymonkey.com/v3/surveys/__id__/responses",
                     'details':"http://api.surveymonkey.com/v3/surveys/__id__/details",
-                    'rollups':"http://api.surveymonkey.com/v3/surveys/__id__/rollups"
+                    'rollups':"http://api.surveymonkey.com/v3/surveys/__id__/rollups",
+                    'responses_bulk':"http://api.surveymonkey.com/v3/surveys/__id__/responses/bulk",                   
                     }
 
         return endpoint
@@ -37,6 +38,14 @@ class SurveyMonkey:
 
         return data
 
+    def GetResponsesBullk(self,id):
+        url = self.EndPointSurvey()['responses_bulk'].replace('__id__',str(id))
+        r = self.session.get(url)
+        data = r.json()
+
+        return data
+
+
     def GetForms(self):
         url = self.EndPointSurvey()['apiurl']
         r = self.session.get(url)
@@ -48,7 +57,7 @@ class SurveyMonkey:
         #formularios['link'] = [key['href'] for key in data]
         formularios['id'] = [key['id'] for key in data]
 
-        formularios = formularios[formularios['titulo_interno']!='']
+        formularios = formularios[0:2]
         return formularios
         
 
